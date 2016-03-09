@@ -1,0 +1,15 @@
+/log
+/tmp
+
+# Config containing sensitive data
+config.yml
+
+# Environment normalization
+/.bundle
+/vendor/bundle
+
+# Debugger command history
+.byebug_history
+
+# Redis dump
+dump.rdb
