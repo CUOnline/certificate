@@ -1,4 +1,8 @@
 - if @pass
   p Your certificate is being generated and will be sent to you once complete.
 - else
-  p You have not yet completed the requirements for a certificate.
+  p
+    | You have not yet met the requirements for a certificate. 
+    | You must complete all course modules 
+    a [target='_parent' href='#{settings.canvas_url}/courses/#{@course_id}/modules'] here 
+    | and complete the final quiz with a score of 14/16 (85%) or better.
