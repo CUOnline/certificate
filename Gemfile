@@ -1,1 +1,1 @@
-gem 'wolf', :git => 'https://github.com/CUOnline/wolf'
+gem 'wolf_core', :git => 'https://github.com/CUOnline/wolf_core'

@@ -1,11 +1,12 @@
 require 'bundler/setup'
-require 'wolf'
+require 'wolf_core'
 
-class CertificateApp < Wolf::Base
-  set :quiz_id, 1234
-  set :email_subject, 'Academic Integrity Certificate'
+class CertificateApp < WolfCore::App
   set :root, File.dirname(__FILE__)
   self.setup
+
+  set :quiz_id, 1234
+  set :email_subject, 'Academic Integrity Certificate'
 
   post '/' do
     @course_id = params['custom_canvas_course_id']
