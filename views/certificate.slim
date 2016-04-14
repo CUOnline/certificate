@@ -2,25 +2,33 @@ head
   css:
     body {
       font-family: HelveticaNeue-Light, Helvetica Neue, Helvetica, sans-serif;
+      font-size: 2.7em;
+      margin: 0;
+      padding: 10px;
+      text-align: center;
+      vertical-align: middle;
+      width: 2000px;
     }
 
     div {
-      border: 85px solid black;
-      font-size: 5.2em;
-      height: 2220px;
-      margin: 25px;
-      padding-top: 110px;
-      text-align: center;
-      vertical-align: middle;
-      width: 3070px;
+      border: 48px solid black;
+      height: 1384px;
+      padding-top: 60px;
     }
 
     h2, h3 {
-      font-weight: 400;
+      font-weight: lighter;
+    }
+
+    img {
+      height: auto;
+      width: 59%;
     }
 
     p {
-      margin-top: 75px;
+      font-weight: lighter;
+      padding-bottom: 20px;
+      padding-top: 20px;
     }
 
 body
@@ -31,4 +39,4 @@ body
     h2 Academic Integrity Course
     p on
     h3 #{(@timestamp || Time.now).strftime("%B %e, %Y")}
-    img [src = 'logo.png']
+    img [src = '../public/logo.png']

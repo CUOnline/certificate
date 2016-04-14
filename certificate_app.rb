@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'wolf_core'
+require 'time'
 
 class CertificateApp < WolfCore::App
   set :root, File.dirname(__FILE__)
@@ -20,6 +21,7 @@ class CertificateApp < WolfCore::App
     if passed_quizzes.any?
       @pass = true
       @name = params['lis_person_name_full']
+      @timestamp = Time.parse(passed_quizzes.first['finished_at'])
       Resque.enqueue(CertificateWorker, (slim :certificate, :layout => false),
                      params['lis_person_contact_email_primary'])
     end
