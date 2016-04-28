@@ -2,7 +2,7 @@
   p Your certificate is being generated and will be sent to you once complete.
 - else
   p
-    | You have not yet met the requirements for a certificate. 
-    | You must complete all course modules 
-    a [target='_parent' href='#{settings.canvas_url}/courses/#{@course_id}/modules'] here 
-    | and complete the final quiz with a score of 14/16 (85%) or better.
+    | To receive a certificate, you must complete 
+    a [href="#{settings.canvas_url}/courses/#{params['custom_canvas_course_id']}\
+            /quizzes/#{params['custom_quiz_id']}" target='_parent' ] this quiz
+    |  with at least #{params['custom_score_req']} correct answers.

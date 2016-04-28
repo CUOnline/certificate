@@ -34,9 +34,9 @@ head
 body
   div
     p This document certifies that
-    h2 #{@name}
-    p has completed the
-    h2 Academic Integrity Course
+    h2 #{params['lis_person_name_full']}
+    p has completed requirements for
+    h2 #{params['context_title']}
     p on
-    h3 #{(@timestamp || Time.now).strftime("%B %e, %Y")}
-    img [src = '../public/logo.png']
+    h3 #{(@timestamp)}
+    img [src = "#{request.scheme}://#{env['HTTP_HOST']}#{mount_point}/logo.png"]
