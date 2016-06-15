@@ -5,8 +5,9 @@ require './certificate_worker'
 
 class CertificateApp < WolfCore::App
   set :root, File.dirname(__FILE__)
-  self.setup
+  set :views, ["#{root}/views", settings.base_views]
 
+  set :title, 'Certificate Generator'
   set :email_subject, 'Canvas Certificate'
 
   post '/' do

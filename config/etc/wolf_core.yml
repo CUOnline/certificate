@@ -24,16 +24,15 @@ development: &defaults
     - 'AccountAdmin'
     - 'TeacherEnrollment'
 
-  # Logging output
-  resque_log_file: 'log/resque.log'
-  request_log_file: 'log/request.log'
-  auth_log_file: 'log/auth.log'
-
   # Report email settings
   email_subject: 'Canvas Data Report'
   from_email: "Canvas <donotreply@ucdenver.edu>"
   smtp_server: 'mail.ucdenver.pvt'
   smtp_port: 25
+
+  # Tmp directory for generated files/logs
+  tmp_dir: '/tmp'
+  log_dir: '/var/log'
 
 test:
   <<: *defaults
