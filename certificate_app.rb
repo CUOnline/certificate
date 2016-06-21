@@ -17,7 +17,16 @@ class CertificateApp < WolfCore::App
           "/quizzes/#{params['custom_quiz_id']}/submissions"
 
     begin
-      submissions = canvas_api(:get, url)["quiz_submissions"]
+      response = canvas_api(:get, url)
+      submissions = response['json']['quiz_submissions']
+
+      pages = parse_pages(response['headers'][:link])
+      while pages['next']
+        response = canvas_api(:get, '', {:url => pages['next']})
+        submissions += response['json']['quiz_submissions']
+        pages = parse_pages(response['headers'][:link])
+      end
+
       passed_quizzes = submissions.select do |s|
         s['user_id'].to_s == params['custom_canvas_user_id'] &&
         s['kept_score'].to_i >= params['custom_score_req'].to_i
