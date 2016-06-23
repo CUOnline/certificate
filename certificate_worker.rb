@@ -5,8 +5,8 @@ class CertificateWorker
   @queue = 'certificate'
 
   def self.perform(cert_html, email)
-    html_path = File.expand_path("tmp/cert.html")
-    pdf_path = File.expand_path("tmp/cert.pdf")
+    html_path = File.join(CertificateApp.tmp_dir, 'cert.html')
+    pdf_path = File.join(CertificateApp.tmp_dir, 'cert.pdf')
 
     File.open(html_path, 'w+') { |f| f.write(cert_html) }
     convert_to_pdf(html_path, pdf_path)
