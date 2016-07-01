@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/cuonline/wolf_core
-  revision: 211e68f2f1b97ae0c4ebd3abb7f7fcb7d494d780
+  revision: ba93abe1b1d64a949fe609d98813a7973948b527
   specs:
     wolf_core (0.0.1)
       dbd-odbc (~> 0.2)
