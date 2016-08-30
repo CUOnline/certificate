@@ -18,12 +18,12 @@ class CertificateApp < WolfCore::App
 
     begin
       response = canvas_api(:get, url, {:raw => true})
-      submissions = JSON.parse(response)['quiz_submissions']
+      submissions = JSON.parse(response.body)['quiz_submissions']
 
-      pages = parse_pages(response.headers[:link])
+      pages = parse_pages(response.headers[:link] || '')
       while pages['next']
         response = canvas_api(:get, '', {:url => pages['next'], :raw => true})
-        submissions += JSON.parse(response)['quiz_submissions']
+        submissions += JSON.parse(response.body)['quiz_submissions']
         pages = parse_pages(response.headers[:link])
       end
 
