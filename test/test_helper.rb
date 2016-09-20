@@ -6,6 +6,7 @@ require 'minitest/autorun'
 require 'minitest/rg'
 require 'mocha/mini_test'
 require 'rack/test'
+require 'webmock/minitest'
 
 # Turn on SSL for all requests
 class Rack::Test::Session
@@ -23,6 +24,16 @@ class Minitest::Test
 
   def app
     CertificateApp
+  end
+
+  def setup
+    @canvas_url = 'https://canvasurl.com'
+    app.settings.stubs(:canvas_url).returns(@canvas_url)
+    app.settings.stubs(:api_cache).returns(false)
+
+    WebMock.enable!
+    WebMock.disable_net_connect!(allow_localhost: true)
+    WebMock.reset!
   end
 
   def login(session_params = {})

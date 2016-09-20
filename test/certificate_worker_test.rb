@@ -3,8 +3,8 @@ require_relative './test_helper'
 class CertificateWorkerTest < Minitest::Test
 
   def setup
-    tmp_dir = app.send(:tmp_dir) || '/tmp'
-    app.set :tmp_dir, tmp_dir
+    tmp_dir = '/tmp'
+    app.settings.stubs(:tmp_dir).returns(tmp_dir)
 
     @cert_html = File.expand_path(File.join(tmp_dir, 'cert.html'))
     @cert_pdf = File.expand_path(File.join(tmp_dir, 'cert.pdf'))

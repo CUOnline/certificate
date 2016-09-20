@@ -3,8 +3,7 @@ require_relative './test_helper'
 class CertificateAppTest < Minitest::Test
   def teardown
     # Should be true for every request
-    assert_equal "ALLOW-FROM https://ucdenver.test.instructure.com",
-                  last_response.header['X-Frame-Options']
+    assert_equal "ALLOW-FROM #{@canvas_url}", last_response.header['X-Frame-Options']
   end
 
   def test_get_lti_config
@@ -29,28 +28,23 @@ class CertificateAppTest < Minitest::Test
   end
 
   def test_post_passed_reqs
+    WebMock.reset!
     course_id = '123'
     user_id = '456'
     quiz_id = '789'
-    contact_email = 'test@gmail.com'
-    api_response = {
+    contact_email = 'test@example.com'
+    response = {
       "quiz_submissions" => [{
         'user_id' => user_id,
         'kept_score' => 16,
         'finished_at' => '2016-04-06T19:42:43Z'
       }]
-    }.to_json
-
-    response = mock()
-    response.stubs(:body).returns(api_response)
-    response.stubs(:headers).returns({:link => ''})
+    }
 
     Resque.expects(:enqueue).with(CertificateWorker, anything, contact_email)
     app.any_instance.expects(:valid_lti_request?).returns(true)
-    api_url = "courses/#{course_id}/quizzes/#{quiz_id}/submissions"
-    app.any_instance.expects(:canvas_api)
-                    .with(:get, api_url, {:raw => true})
-                    .returns(response)
+    stub_request(:get, /courses\/#{course_id}\/quizzes\/#{quiz_id}\/submissions/)
+      .to_return(:body => response.to_json, :headers => {'Content-Type' => 'application/json'}, :status => 200)
 
     post '/', {
       'custom_canvas_course_id' => course_id,
@@ -65,30 +59,25 @@ class CertificateAppTest < Minitest::Test
   end
 
   def test_post_failed_reqs
+    WebMock.reset!
     course_id = '123'
     user_id = '456'
     quiz_id = '789'
-    contact_email = 'test@gmail.com'
+    contact_email = 'test@example.com'
 
-    api_response = {
+    response = {
       "quiz_submissions" => [{
         'user_id' => user_id,
         'kept_score' => 14,
         'finished_at' => '2016-04-06T19:42:43Z'
       }]
-    }.to_json
-
-    response = mock()
-    response.stubs(:body).returns(api_response)
-    response.stubs(:headers).returns({:link => ''})
+    }
 
     Resque.expects(:enqueue).never
     app.any_instance.expects(:valid_lti_request?).returns(true)
 
-    api_url = "courses/#{course_id}/quizzes/#{quiz_id}/submissions"
-    app.any_instance.expects(:canvas_api)
-                    .with(:get, api_url, {:raw => true})
-                    .returns(response)
+    stub_request(:get, /courses\/#{course_id}\/quizzes\/#{quiz_id}\/submissions/)
+      .to_return(:body => response.to_json, :headers => {'Content-Type' => 'application/json'}, :status => 200)
 
     post '/', {
       'custom_canvas_course_id' => course_id,
@@ -106,14 +95,12 @@ class CertificateAppTest < Minitest::Test
     course_id = '123'
     user_id = '456'
     quiz_id = '789'
-    contact_email = 'test@gmail.com'
+    contact_email = 'test@example.com'
 
     Resque.expects(:enqueue).never
     app.any_instance.expects(:valid_lti_request?).returns(true)
-    api_url = "courses/#{course_id}/quizzes/#{quiz_id}/submissions"
-    app.any_instance.expects(:canvas_api)
-                    .with(:get, api_url, {:raw => true})
-                    .raises(RestClient::ResourceNotFound)
+    stub_request(:get, /courses\/#{course_id}\/quizzes\/#{quiz_id}\/submissions/)
+      .to_return(:status => 404)
 
     post '/', {
       'custom_canvas_course_id' => course_id,
@@ -131,25 +118,19 @@ class CertificateAppTest < Minitest::Test
     course_id = '123'
     user_id = '456'
     quiz_id = '789'
-    contact_email = 'test@gmail.com'
-    api_response = {
+    contact_email = 'test@example.com'
+    response = {
       "quiz_submissions" => [{
         'user_id' => user_id,
         'kept_score' => 14,
         'finished_at' => '2016-04-06T19:42:43Z'
       }]
-    }.to_json
-
-    response = mock()
-    response.stubs(:body).returns(api_response)
-    response.stubs(:headers).returns({:link => ''})
+    }
 
     Resque.expects(:enqueue).never
     app.any_instance.expects(:valid_lti_request?).returns(false)
-    api_url = "courses/#{course_id}/quizzes/#{quiz_id}/submissions"
-    app.any_instance.expects(:canvas_api)
-                    .with(:get, api_url, {:raw => true})
-                    .returns(response)
+    stub_request(:get, /courses\/#{course_id}\/quizzes\/#{quiz_id}\/submissions/)
+      .to_return(:body => response.to_json)
 
     post '/', {
       'custom_canvas_course_id' => course_id,
@@ -166,38 +147,47 @@ class CertificateAppTest < Minitest::Test
   def test_post_paginated_response
     course_id = '123'
     user_id = '456'
-    contact_email = 'test@gmail.com'
-    api_response = {
+    quiz_id = '789'
+    contact_email = 'test@example.com'
+    first_page_response = {
       "quiz_submissions" => [{
         'user_id' => user_id,
         'kept_score' => 6,
         'finished_at' => '2015-01-05T19:40:40Z'
       }]
-    }.to_json
-    first_response = mock()
-    first_response.stubs(:body).returns(api_response)
-    first_response.stubs(:headers).returns({:link => '<page1>; rel="current", <page2>; rel="next"'})
+    }
 
-    api_response = {
+    second_page_response = {
       "quiz_submissions" => [{
         'user_id' => user_id,
         'kept_score' => 16,
         'finished_at' => '2016-04-06T19:42:43Z'
       }]
-    }.to_json
-    second_response = mock()
-    second_response.stubs(:body).returns(api_response)
-    second_response.stubs(:headers).returns({:link => ''})
+    }
 
     Resque.expects(:enqueue).with(CertificateWorker, anything, contact_email)
     app.any_instance.expects(:valid_lti_request?).returns(true)
-    app.any_instance.expects(:canvas_api).twice
-                    .returns(first_response).then.returns(second_response)
+
+    stub_request(:get, /courses\/#{course_id}\/quizzes\/#{quiz_id}\/submissions/)
+      .to_return(:body => first_page_response.to_json,
+                 :headers => {
+                   'Content-Type' => 'application/json',
+                   'link' => '<page1>; rel="current", <page2>; rel="next"'
+                  })
+
+
+    stub_request(:get, /page2/)
+      .to_return(:body => second_page_response.to_json,
+                 :headers => {
+                   'Content-Type' => 'application/json',
+                   'link' => ''
+                  })
+
 
     post '/', {
       'custom_canvas_course_id' => course_id,
       'custom_canvas_user_id' => user_id,
-      'custom_quiz_id' => '789',
+      'custom_quiz_id' => quiz_id,
       'custom_score_req' => '15',
       'lis_person_contact_email_primary' => contact_email
     }
