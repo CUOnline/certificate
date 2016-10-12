@@ -8,13 +8,13 @@ class CertificateApp < WolfCore::App
   set :title, 'Certificate Generator'
   set :email_subject, 'Canvas Certificate'
   set :root, File.dirname(__FILE__)
-  set :api_cache, false
+  set :api_cache, ActiveSupport::Cache::RedisStore.new(redis_options.merge({'expires_in' => 300}))
 
   post '/' do
     @invalid_request = !valid_lti_request?(request, params)
 
     url = "courses/#{params['custom_canvas_course_id']}"\
-          "/quizzes/#{params['custom_quiz_id']}/submissions"
+          "/quizzes/#{params['custom_quiz_id']}/submissions?per_page=100"
 
     response = canvas_api.get(url)
     if response.status == 404
