@@ -1,6 +1,5 @@
 ENV['RACK_ENV'] ||= 'test'
 
-require_relative '../certificate_app'
 require 'minitest'
 require 'minitest/autorun'
 require 'minitest/rg'

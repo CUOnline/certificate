@@ -1,4 +1,5 @@
 require_relative './test_helper'
+require_relative '../certificate_app'
 
 class CertificateAppTest < Minitest::Test
   def teardown
@@ -40,7 +41,7 @@ class CertificateAppTest < Minitest::Test
         'finished_at' => '2016-04-06T19:42:43Z'
       }]
     }
-
+    EmailLogger.expects(:write).with(contact_email)
     Resque.expects(:enqueue).with(CertificateWorker, anything, contact_email)
     app.any_instance.expects(:valid_lti_request?).returns(true)
     stub_request(:get, /courses\/#{course_id}\/quizzes\/#{quiz_id}\/submissions/)
@@ -73,6 +74,7 @@ class CertificateAppTest < Minitest::Test
       }]
     }
 
+    EmailLogger.expects(:write).never
     Resque.expects(:enqueue).never
     app.any_instance.expects(:valid_lti_request?).returns(true)
 
@@ -164,7 +166,7 @@ class CertificateAppTest < Minitest::Test
         'finished_at' => '2016-04-06T19:42:43Z'
       }]
     }
-
+    EmailLogger.expects(:write).with(contact_email)
     Resque.expects(:enqueue).with(CertificateWorker, anything, contact_email)
     app.any_instance.expects(:valid_lti_request?).returns(true)
 

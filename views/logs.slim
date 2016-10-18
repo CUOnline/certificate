@@ -1,0 +1,17 @@
+- search_term ||= ''
+
+form [action='#{CertificateApp.mount_point}/logs' method='GET']
+  label [for='search-term'] Search logs for email:&nbsp;
+  input [type='text' id='search-term' name='search-term' value="#{search_term}"]
+  input [type='submit' value='Search']
+
+hr
+
+ul
+  -logs.each do |log|
+    li
+      span #{log} &nbsp;(&nbsp;
+      a [href='#{CertificateApp.mount_point}/log/#{URI.encode(log)}' target='_blank'] View
+      | &nbsp;|&nbsp;
+      a [href='#{CertificateApp.mount_point}/log/#{URI.encode(log)}?download=1'] Download
+      | &nbsp;)

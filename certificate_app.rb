@@ -1,7 +1,9 @@
 require 'bundler/setup'
 require 'wolf_core'
 require 'time'
+require 'uri'
 
+require_relative './email_logger'
 require_relative './certificate_worker'
 
 class CertificateApp < WolfCore::App
@@ -9,6 +11,8 @@ class CertificateApp < WolfCore::App
   set :email_subject, 'Canvas Certificate'
   set :root, File.dirname(__FILE__)
   set :api_cache, ActiveSupport::Cache::RedisStore.new(redis_options.merge({'expires_in' => 300}))
+
+  use EmailLogger
 
   post '/' do
     @invalid_request = !valid_lti_request?(request, params)
@@ -42,6 +46,9 @@ class CertificateApp < WolfCore::App
       @timestamp = Time.parse(passed_quizzes.first['finished_at']).strftime("%B %e, %Y")
       Resque.enqueue( CertificateWorker, (slim :certificate, :layout => false),
                       params['lis_person_contact_email_primary'] )
+
+      EmailLogger.write(params['lis_person_contact_email_primary'] ||
+                        "Email not found for #{@user_name}")
     end
 
     slim :index, :layout => false
