@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'wolf_core', :git => 'https://github.com/CUOnline/wolf_core', :ref => '03ef85650'
+gem 'wolf_core', :git => 'https://github.com/CUOnline/wolf_core', :tag => 'v0.1.0'
 
 group :test, :development do
   gem 'byebug', '~> 8.2'
