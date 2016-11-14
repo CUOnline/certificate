@@ -8,7 +8,7 @@ class CertificateApp < WolfCore::App
   set :title, 'Certificate Generator'
   set :email_subject, 'Canvas Certificate'
   set :root, File.dirname(__FILE__)
-  set :api_cache, ActiveSupport::Cache::RedisStore.new(redis_options.merge({'expires_in' => 300}))
+  set :api_cache, ActiveSupport::Cache::RedisStore.new(redis_options.merge({:expires_in => 300}))
 
   post '/' do
     @invalid_request = !valid_lti_request?(request, params)
