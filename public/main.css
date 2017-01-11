@@ -1,0 +1,30 @@
+#dev-keys-example {
+  margin-bottom: 20px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.btn-cu {
+  display: inline !important;
+  margin-left: 20px;
+}
+
+.example {
+  display: block;
+  margin-bottom: 20px;
+  margin-left: 12%;
+  margin-top: 10px;
+  width: 75%;
+}
+
+form {
+  text-align: center;
+}
+
+label {
+  padding: 10px;
+}
+
+p {
+  margin: 30px;
+}

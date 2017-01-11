@@ -27,6 +27,48 @@ class CertificateAppTest < Minitest::Test
     assert_equal 400, last_response.status
   end
 
+  def test_get_generate_config
+    get '/generate-config'
+    assert_equal 200, last_response.status
+  end
+
+  def test_post_generate_config
+    post '/generate-config', {'quiz_id' => '123', 'score_requirement' => '4'}
+    assert_equal 302, last_response.status
+    follow_redirect!
+    assert_equal '/lti_config/123/4', last_request.path
+  end
+
+  def test_post_generate_config_missing_params
+    post '/generate-config', {}
+    assert_equal 302, last_response.status
+    assert_match /id is required/, last_request.env['rack.session']['flash'][:danger]
+    assert_match /requirement is required/, last_request.env['rack.session']['flash'][:danger]
+    follow_redirect!
+    assert_equal '/generate-config', last_request.path
+  end
+
+  def test_post_generate_config_invalid_params
+    post '/generate-config', {'quiz_id' => 'a', 'score_requirement' => 'e'}
+    assert_equal 302, last_response.status
+    assert_match /requirement must be a positive integer/, last_request.env['rack.session']['flash'][:danger]
+    assert_match /id must be a positive integer/, last_request.env['rack.session']['flash'][:danger]
+    follow_redirect!
+    assert_equal '/generate-config', last_request.path
+  end
+
+  def test_post_nonexistent_quiz
+    quiz_id = '123'
+    app.any_instance.expects(:quiz_exists?).with(quiz_id).returns(false)
+
+    post '/generate-config', {'quiz_id' => quiz_id, 'score_requirement' => '4'}
+
+    assert_equal 302, last_response.status
+    assert_match /not found/, last_request.env['rack.session']['flash'][:danger]
+    follow_redirect!
+    assert_equal '/generate-config', last_request.path
+  end
+
   def test_post_passed_reqs
     WebMock.reset!
     course_id = '123'

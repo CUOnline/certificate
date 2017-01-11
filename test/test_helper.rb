@@ -34,6 +34,8 @@ class Minitest::Test
     WebMock.enable!
     WebMock.disable_net_connect!(allow_localhost: true)
     WebMock.reset!
+
+    CertificateApp.settings.stubs(:mount).returns('')
   end
 
   def login(session_params = {})

@@ -10,6 +10,23 @@ class CertificateApp < WolfCore::App
   set :root, File.dirname(__FILE__)
   set :api_cache, ActiveSupport::Cache::RedisStore.new(redis_options.merge({:expires_in => 300}))
 
+  helpers do
+    def errors_for_param(key, params)
+      errors = []
+      formatted_key = key.gsub('_', ' ').capitalize
+      if params[key].nil? || params[key].empty?
+        errors << "#{formatted_key} is required"
+      elsif params[key].to_i <= 0
+        errors << "#{formatted_key} must be a positive integer"
+      end
+      errors
+    end
+
+    def quiz_exists?(quiz_id)
+      canvas_data("SELECT id FROM quiz_dim WHERE canvas_id = ?", quiz_id).any?
+    end
+  end
+
   post '/' do
     @invalid_request = !valid_lti_request?(request, params)
 
@@ -45,6 +62,30 @@ class CertificateApp < WolfCore::App
     end
 
     slim :index, :layout => false
+  end
+
+  get '/generate-config' do
+    slim :generate_config
+  end
+
+  post '/generate-config' do
+    errors = [
+      errors_for_param('quiz_id', params),
+      errors_for_param('score_requirement', params)
+    ].flatten
+
+    # Only check quiz existence if ID format validation passes
+    if errors.empty? && !quiz_exists?(params['quiz_id'])
+      errors << "Quiz with specified ID not found. Note that it may take up to 48 "\
+                "hours for a newly created quiz to show up in the database."
+    end
+
+    if errors.any?
+      flash[:danger] = errors.join("\n<br/>")
+      redirect "#{mount_point}/generate-config"
+    else
+      redirect "#{mount_point}/lti_config/#{params['quiz_id']}/#{params['score_requirement']}"
+    end
   end
 
   get '/lti_config/:quiz_id/:score_req' do

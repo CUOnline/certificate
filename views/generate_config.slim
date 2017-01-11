@@ -1,0 +1,43 @@
+link [rel='stylesheet' href='#{mount_point}/assets/wolf_core.css']
+
+form [action='generate-config', method='POST']
+  label [for='quiz_id'] Quiz ID:
+  input [id='quiz_id' name='quiz_id' type='text']
+  label [for='score_requirement'] Score Requirement:
+  input [id='score_requirement' name='score_requirement' type='text']
+  input.btn-cu [type='submit' value='Generate']
+
+
+hr
+
+p This page will help you generate the XML configuration needed to add the certificate generator LTI tool to a course.
+
+p
+  <u>Quiz ID</u> is the ID of the quiz that needs to be passed in order to receive the certificate. It can be found by navigating to the quiz in Canvas and looking at the rightmost number in the browser's address bar.
+  img.example [src='#{mount_point}/quiz_id_example.png']
+
+  <u> Score Requirement </u> is the number of correct answers needed on the specified quiz to receive the certificate.
+
+hr
+
+p
+  | After clicking "Generate", you will be redirected to a page with configuration data. Follow these instructions to add your generated config to a course.
+  ol
+    li Navigate to the course where you wish to add the certificate generator. Click "Settings" on the left-hand sidebar navigation, go to the "Apps" tab, and click the "+ App" button.
+
+    img.example [src='#{mount_point}/add_app_example.png']
+
+    li
+      | In the App configuration popup, populate the following fields:
+      ul
+        li Configuration Type: "By URL"
+        li Name: An identifier of your choosing.
+        li Config URL: The URL of your generated configuration.
+        li
+          | Consumer Key & Shared Secret: These can be obtained on the 
+          a [href="#{settings.canvas_url}/accounts/#{settings.canvas_account_id}/developer_keys", target="_blank"] Developer Keys 
+          | page. Look for a key with a "URI" matching the domain of <u>this</u> page, and use the "ID" and "Key" as the app's "Consumer Key" and "Shared Secret", repectively.
+
+        img#dev-keys-example [src='#{mount_point}/dev_keys_example.png']
+
+        li Click "Submit" and refresh the page. The "Get Certificate" item should appear on course's left-hand navigation menu.
