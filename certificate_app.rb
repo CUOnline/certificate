@@ -56,7 +56,10 @@ class CertificateApp < WolfCore::App
     if passed_quizzes && passed_quizzes.any?
       @pass = true
       @user_name = params['lis_person_name_full']
-      @timestamp = Time.parse(passed_quizzes.first['finished_at']).strftime("%B %e, %Y")
+
+      quiz_time = passed_quizzes.first['finished_at'] || passed_quizzes.first['started_at']
+      @timestamp = Time.parse(quiz_time).strftime("%B %e, %Y")
+
       Resque.enqueue( CertificateWorker, (slim :certificate, :layout => false),
                       params['lis_person_contact_email_primary'] )
     end
